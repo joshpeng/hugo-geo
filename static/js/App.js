@@ -10,8 +10,23 @@ if (!window.location.origin) {
 	window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
 }
 
+if ($.browser.mobile) {
+	if (window.location.pathname == "/") {
+		$('#menu').removeClass('no-js');
+		$('#content').hide();
+	}
+	else {
+		$('#content').removeClass('no-js');
+		$('#content').show();
+	}
+	$("#bs-example-navbar-collapse-1 ul").append('<li><a href="/blog">Blog</a></li>');
+}
+else {
+	$('#menu').removeClass('no-js');
+	$('#content').removeClass('no-js');
+}
+
 $(document).ready(function() {
-	
 	// Change all href links that go out of the origin to open in a new window
 	// Relative links that start with /, #, or . (ie /post/my-post or ../post/my-post or #test)
 	// should be untouched
@@ -27,7 +42,7 @@ $(document).ready(function() {
 	// Credit to GitHub user dazinator
 	// https://github.com/alexurquhart/hugo-geo/issues/17
 	$( ".highlighttable" ).wrap("<div class='table-responsive'></div>");
-	
+
 	// Highlight all on load if highlighting
 	if (typeof hljs !== "undefined") {
 		hljs.initHighlightingOnLoad();
@@ -38,8 +53,83 @@ $(document).ready(function() {
 		return;
 	}
 	
+	
 	// Peace out if in a mobile browser
 	if ($.browser.mobile) {
+		var metaTitle
+		var metaUrl
+		var metaUsername
+		var metas = document.getElementsByTagName('meta');
+		for (i=0; i<metas.length; i++) {
+			if (metas[i].getAttribute("property") == "og:site_name")
+				metaTitle = metas[i].getAttribute("content");
+			else if (metas[i].getAttribute("property") == "og:base_url")
+				metaUrl = metas[i].getAttribute("content");
+			else if (metas[i].getAttribute("property") == "og:user_name")
+				metaUsername = metas[i].getAttribute("content");
+		}
+
+		if (window.location.pathname == "/") {
+			$('#content').hide();
+			$('#menu').show();
+			replaceTitleOnMobile = '<a class="navbar-brand" href="' + metaUrl + '">' + metaTitle + '</a>'
+			$('.navbar-brand').replaceWith(replaceTitleOnMobile);
+		}
+		else {
+			$('#menu').hide();
+			$('#content').show();
+		}
+		
+		var replaceTitleWithUser = '<a class="navbar-brand" href="' + metaUrl + '">' + metaUsername + '</a>'
+		
+		function switchToMobileBlog() {
+			$('body').fadeOut(300, function() {
+				window.location="/blog"
+			});
+		}
+
+		$('div#menu').click(function() {
+			switchToMobileBlog()
+			
+			// Use these if not transitioning on mobile to another URL
+			// $('#content').show();
+			// $('#menu').fadeOut();
+			// $('.navbar-brand').replaceWith(replaceTitleWithUser);
+		})
+
+		$(function() {
+			$('div#menu').swipe( {
+				swipe: function(event, direction, distance, duration, fingerCount, fingerData) {
+					switchToMobileBlog()
+					// Use these if not transitioning on mobile to another URL
+					// $('#content').show();
+					// $('#menu').fadeOut();
+					// $('.navbar-brand').replaceWith(replaceTitleWithUser);
+				},
+				tap: function() {
+					switchToMobileBlog()
+					// Use these if not transitioning on mobile to another URL
+					// $('#content').show();
+					// $('#menu').fadeOut();
+					// $('.navbar-brand').replaceWith(replaceTitleWithUser);
+				},
+				doubleTap: function() {
+					switchToMobileBlog()
+					// Use these if not transitioning on mobile to another URL
+					// $('#content').show();
+					// $('#menu').fadeOut();
+					// $('.navbar-brand').replaceWith(replaceTitleWithUser);
+				},
+				longTap: function() {
+					switchToMobileBlog()
+					// Use these if not transitioning on mobile to another URL
+					// $('#content').show();
+					// $('#menu').fadeOut();
+					// $('.navbar-brand').replaceWith(replaceTitleWithUser);
+				}
+			});
+		})
+
 		return;	
 	}
 	
@@ -62,7 +152,7 @@ $(document).ready(function() {
 		var Start = Date.now();
 		var width = $('#menu').outerWidth(true);
 	   	var height = $('#menu').outerHeight(true);
-		var rotate = [10];
+		var rotate = [80];
 	    var velocity = [0.001];
 	
 		var projection = d3.geo.orthographic()
